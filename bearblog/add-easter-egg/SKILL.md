@@ -50,8 +50,7 @@ List available easter eggs by reading the subdirectories under `${CLAUDE_SKILL_D
 
    - **No target specified:** Show the generated snippet and ask the user where to apply it (specific post or whole blog).
 
-5. **Explain the trigger.** Tell the user how to activate the easter egg:
-   - **bladerunner**: Type `aaaaa` (5 consecutive "a" characters) anywhere on the page
+5. **Explain the trigger.** Tell the user how to activate the easter egg (see details below).
 
 ## Easter egg details
 
@@ -59,6 +58,61 @@ List available easter eggs by reading the subdirectories under `${CLAUDE_SKILL_D
 - **Trigger:** Type `aaaaa`
 - **Effect:** Dark cinematic overlay with animated origami unicorn that unfolds from nothing, gentle floating animation, rain effect, and the famous Blade Runner quote
 - **Dismiss:** Click anywhere on the overlay, or wait 10 seconds
+
+### konami
+- **Trigger:** Konami Code — `↑↑↓↓←→←→BA`
+- **Effect:** Retro 8-bit celebration with "30 LIVES" text, pixel confetti in NES colors, CRT scanline filter, score displays
+- **Dismiss:** Click or wait 8 seconds
+
+### jurassicpark
+- **Trigger:** Type `nedry`
+- **Effect:** Full-screen Nedry lockout — green-on-black CRT terminal floods with "Ah ah ah, you didn't say the magic word!" lines. Clicking spawns extra text bursts. Wagging finger animation.
+- **Dismiss:** Type `please` to unlock, or wait 15 seconds
+
+### mortalkombat
+- **Trigger:** Type `fatality`
+- **Effect:** Dramatic sequence: "FINISH HIM!" with screen shake → "FATALITY" in dripping red → page elements shatter outward → "FLAWLESS VICTORY". MK dragon silhouette in background.
+- **Dismiss:** Click or wait 10 seconds
+
+### nbajam
+- **Trigger:** Type `boomshakalaka`
+- **Effect:** Big Head Mode — all images on the page scale to 2x. "HE'S ON FIRE!" in flaming text, "BOOMSHAKALAKA!" slam-dunks onto screen, announcer callouts rotate ("FROM DOWNTOWN!", "IS IT THE SHOES?!"), score overlay.
+- **Dismiss:** Click the fire text, or wait 15 seconds
+
+### hackers
+- **Trigger:** Type `acidburn`
+- **Effect:** Page glitch effect with jitter animation, Matrix-style character rain on canvas (green/cyan/magenta), "HACK THE PLANET" in neon text, random page elements get corrupted with skew/color effects, animated flame SVG
+- **Dismiss:** Click or wait 10 seconds
+
+### realgenius
+- **Trigger:** Type `popcorn`
+- **Effect:** Red laser beam fires from top of screen, popcorn kernels explode outward from impact point in all directions, popcorn pile accumulates at the bottom of the page
+- **Dismiss:** Click or wait 12 seconds
+
+### godzilla
+- **Trigger:** Type `godzilla`
+- **Effect:** Cute chibi Godzilla with spines walks across the screen left to right. Legs animate in walk cycle, tail swishes, screen shakes on each stomp. At ~40%, Godzilla breathes fire and "chars" random page elements.
+- **Dismiss:** Godzilla walks off-screen after ~12s, or click to dismiss early
+
+### wargames
+- **Trigger:** Type `wopr`
+- **Effect:** Full-screen green phosphor CRT terminal. WOPR boot sequence types out "GREETINGS PROFESSOR FALKEN. SHALL WE PLAY A GAME?" Interactive — type responses:
+  - `chess` → "LATER. LET'S PLAY GLOBAL THERMONUCLEAR WAR."
+  - `global thermonuclear war` → target selection sequence
+  - `help` → list available games
+  - Anything else → "A STRANGE GAME. THE ONLY WINNING MOVE IS NOT TO PLAY."
+- **Dismiss:** Type `quit`, or wait 30 seconds
+
+### quake
+- **Trigger:** Press `` ` `` (backtick)
+- **Effect:** Drop-down console from top (45% of screen), amber-on-dark styling. Interactive command input with history (Up/Down arrows). Commands:
+  - `god` — golden glow on page
+  - `noclip` — page elements become transparent
+  - `give all` / `impulse 9` — confetti burst
+  - `sv_gravity N` — low values make page float
+  - `kill` — screen flash
+  - `clear` / `help` / `version` / `quit`
+- **Dismiss:** Press `` ` `` again (toggle) or type `quit`
 
 ## Removing an easter egg
 

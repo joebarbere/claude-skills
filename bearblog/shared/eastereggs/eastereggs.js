@@ -15,26 +15,41 @@
 (function () {
   "use strict";
 
-  const EasterEggs = {
+  // Arrow key mapping for trigger sequences (e.g. Konami code)
+  var ARROW_MAP = {
+    ArrowUp: "\x01U",
+    ArrowDown: "\x01D",
+    ArrowLeft: "\x01L",
+    ArrowRight: "\x01R",
+  };
+
+  var EasterEggs = {
     /** @type {Object<string, EasterEggConfig>} */
     _registry: {},
     _inputBuffer: "",
-    _maxTriggerLen: 10,
+    _maxTriggerLen: 20,
     _initialized: false,
     _activeEggs: new Set(),
+    _inputCapture: null,
+
+    // Arrow key tokens for building trigger strings
+    ARROW_UP: "\x01U",
+    ARROW_DOWN: "\x01D",
+    ARROW_LEFT: "\x01L",
+    ARROW_RIGHT: "\x01R",
 
     /**
      * Register an easter egg.
      * @param {string} name        Unique name (matches subdirectory)
      * @param {object} config
-     * @param {string}   config.trigger     Key sequence to activate (e.g. "aaaaa")
-     * @param {Function} config.activate    Called when triggered
+     * @param {string}   config.trigger      Key sequence to activate (e.g. "aaaaa")
+     * @param {Function} config.activate     Called when triggered
      * @param {Function} [config.deactivate] Called to dismiss
-     * @param {string}   [config.event]     Alternative event: "click:5" (5 rapid clicks),
-     *                                      "scroll:top" (scroll to very top fast)
+     * @param {string}   [config.event]      Alternative event: "click:5", "scroll:top"
      * @param {boolean}  [config.once=false] Only trigger once per page load
+     * @param {boolean}  [config.toggle=false] Trigger toggles active/inactive
      */
-    register(name, config) {
+    register: function (name, config) {
       config.enabled = false;
       config._triggered = false;
       this._registry[name] = config;
@@ -49,21 +64,21 @@
     },
 
     /** Enable a specific easter egg by name. */
-    enable(name) {
-      const egg = this._registry[name];
+    enable: function (name) {
+      var egg = this._registry[name];
       if (egg) egg.enabled = true;
     },
 
     /** Enable all registered easter eggs. */
-    enableAll() {
-      for (const egg of Object.values(this._registry)) {
-        egg.enabled = true;
+    enableAll: function () {
+      for (var k in this._registry) {
+        this._registry[k].enabled = true;
       }
     },
 
     /** Disable a specific easter egg. */
-    disable(name) {
-      const egg = this._registry[name];
+    disable: function (name) {
+      var egg = this._registry[name];
       if (egg) {
         egg.enabled = false;
         if (this._activeEggs.has(name) && egg.deactivate) {
@@ -74,8 +89,8 @@
     },
 
     /** Dismiss an active easter egg. */
-    dismiss(name) {
-      const egg = this._registry[name];
+    dismiss: function (name) {
+      var egg = this._registry[name];
       if (egg && this._activeEggs.has(name)) {
         if (egg.deactivate) egg.deactivate();
         this._activeEggs.delete(name);
@@ -83,38 +98,58 @@
     },
 
     /** Dismiss all active easter eggs. */
-    dismissAll() {
-      for (const name of [...this._activeEggs]) {
-        this.dismiss(name);
+    dismissAll: function () {
+      var names = [];
+      this._activeEggs.forEach(function (n) { names.push(n); });
+      for (var i = 0; i < names.length; i++) {
+        this.dismiss(names[i]);
       }
     },
 
     /** List registered easter egg names. */
-    list() {
+    list: function () {
       return Object.keys(this._registry);
     },
 
     /** Manually trigger an easter egg by name. */
-    trigger(name) {
-      const egg = this._registry[name];
+    trigger: function (name) {
+      var egg = this._registry[name];
       if (!egg) return;
+      if (egg.toggle && this._activeEggs.has(name)) {
+        this.dismiss(name);
+        return;
+      }
       if (egg.once && egg._triggered) return;
       egg._triggered = true;
       this._activeEggs.add(name);
       egg.activate();
     },
 
+    /**
+     * Capture all keyboard input, routing it to a callback instead of trigger detection.
+     * Used by interactive eggs like Quake console and WarGames terminal.
+     * @param {Function} callback  Receives the raw KeyboardEvent
+     */
+    captureInput: function (callback) {
+      this._inputCapture = callback;
+    },
+
+    /** Release input capture, resuming normal trigger detection. */
+    releaseInput: function () {
+      this._inputCapture = null;
+    },
+
     /** Inject a CSS stylesheet string into the page. Returns the <style> element. */
-    injectCSS(css) {
-      const style = document.createElement("style");
+    injectCSS: function (css) {
+      var style = document.createElement("style");
       style.textContent = css;
       document.head.appendChild(style);
       return style;
     },
 
     /** Inject an HTML overlay. Returns the container element. */
-    injectOverlay(html, className) {
-      const container = document.createElement("div");
+    injectOverlay: function (html, className) {
+      var container = document.createElement("div");
       container.className = className || "ee-overlay";
       container.innerHTML = html;
       document.body.appendChild(container);
@@ -122,45 +157,65 @@
     },
 
     /** Remove an element from the DOM. */
-    removeElement(el) {
+    removeElement: function (el) {
       if (el && el.parentNode) el.parentNode.removeChild(el);
     },
 
     // ── Internal ────────────────────────────────────────────────────
 
-    _init() {
+    _init: function () {
       if (this._initialized) return;
       this._initialized = true;
+      var self = this;
 
       // Keyboard listener
-      document.addEventListener("keydown", (e) => {
+      document.addEventListener("keydown", function (e) {
         if (e.metaKey || e.ctrlKey || e.altKey) return;
 
-        const key = e.key.length === 1 ? e.key : "";
-        if (!key) return;
-
-        this._inputBuffer += key;
-        if (this._inputBuffer.length > this._maxTriggerLen) {
-          this._inputBuffer = this._inputBuffer.slice(-this._maxTriggerLen);
+        // Input capture mode — route everything to callback
+        if (self._inputCapture) {
+          self._inputCapture(e);
+          return;
         }
 
-        this._checkTriggers();
+        // Map arrow keys to special tokens
+        var mapped = ARROW_MAP[e.key];
+        if (mapped) {
+          self._inputBuffer += mapped;
+          if (self._inputBuffer.length > self._maxTriggerLen) {
+            self._inputBuffer = self._inputBuffer.slice(-self._maxTriggerLen);
+          }
+          self._checkTriggers();
+          return;
+        }
+
+        // Regular printable keys
+        var key = e.key.length === 1 ? e.key : "";
+        if (!key) return;
+
+        self._inputBuffer += key;
+        if (self._inputBuffer.length > self._maxTriggerLen) {
+          self._inputBuffer = self._inputBuffer.slice(-self._maxTriggerLen);
+        }
+
+        self._checkTriggers();
       });
 
       // Click-count listener (for "click:N" events)
-      let clickCount = 0;
-      let clickTimer = null;
-      document.addEventListener("click", () => {
+      var clickCount = 0;
+      var clickTimer = null;
+      document.addEventListener("click", function () {
         clickCount++;
         clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => {
-          for (const [name, egg] of Object.entries(this._registry)) {
+        clickTimer = setTimeout(function () {
+          for (var name in self._registry) {
+            var egg = self._registry[name];
             if (!egg.enabled) continue;
             if (egg.once && egg._triggered) continue;
-            const m = (egg.event || "").match(/^click:(\d+)$/);
+            var m = (egg.event || "").match(/^click:(\d+)$/);
             if (m && clickCount >= parseInt(m[1], 10)) {
               egg._triggered = true;
-              this._activeEggs.add(name);
+              self._activeEggs.add(name);
               egg.activate();
             }
           }
@@ -169,14 +224,15 @@
       });
 
       // Scroll-to-top listener
-      document.addEventListener("scroll", () => {
+      document.addEventListener("scroll", function () {
         if (window.scrollY === 0) {
-          for (const [name, egg] of Object.entries(this._registry)) {
+          for (var name in self._registry) {
+            var egg = self._registry[name];
             if (!egg.enabled) continue;
             if (egg.once && egg._triggered) continue;
             if (egg.event === "scroll:top") {
               egg._triggered = true;
-              this._activeEggs.add(name);
+              self._activeEggs.add(name);
               egg.activate();
             }
           }
@@ -184,10 +240,17 @@
       });
     },
 
-    _checkTriggers() {
-      for (const [name, egg] of Object.entries(this._registry)) {
+    _checkTriggers: function () {
+      for (var name in this._registry) {
+        var egg = this._registry[name];
         if (!egg.enabled) continue;
         if (egg.once && egg._triggered) continue;
+        // Toggle: if already active, deactivate
+        if (egg.toggle && this._activeEggs.has(name) && egg.trigger && this._inputBuffer.endsWith(egg.trigger)) {
+          this.dismiss(name);
+          this._inputBuffer = "";
+          break;
+        }
         if (egg.trigger && this._inputBuffer.endsWith(egg.trigger)) {
           egg._triggered = true;
           this._activeEggs.add(name);

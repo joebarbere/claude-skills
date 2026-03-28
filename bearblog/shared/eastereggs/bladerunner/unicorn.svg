@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280">
+  <!--
+    Origami Unicorn — Blade Runner Easter Egg
+    Low-poly geometric paper style with triangular facets
+  -->
+
+  <!-- Body — main torso -->
+  <polygon points="120,140 180,110 190,170" fill="#e8e0d4" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="120,140 190,170 150,195" fill="#d9d0c2" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="180,110 220,130 190,170" fill="#f0e8dc" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="190,170 220,130 230,175" fill="#ddd5c8" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Chest / front -->
+  <polygon points="120,140 100,120 130,105" fill="#ede5d8" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="120,140 130,105 180,110" fill="#e2dace" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Neck -->
+  <polygon points="100,120 130,105 110,75" fill="#f2ebe0" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="130,105 110,75 140,80" fill="#e5ddd0" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Head -->
+  <polygon points="110,75 90,55 75,70" fill="#f5efe5" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="110,75 90,55 120,50" fill="#ebe3d6" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="90,55 75,70 70,55" fill="#e0d8cb" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Horn -->
+  <polygon points="90,55 85,20 100,48" fill="#f8f4ee" stroke="#d4cdc0" stroke-width="0.5"/>
+  <polygon points="90,55 85,20 80,48" fill="#efe8dc" stroke="#d4cdc0" stroke-width="0.5"/>
+
+  <!-- Ear -->
+  <polygon points="105,52 115,35 120,50" fill="#e8e0d4" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Hindquarters -->
+  <polygon points="230,175 220,130 250,145" fill="#e5ddd0" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="230,175 250,145 255,180" fill="#d5cdc0" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Tail -->
+  <polygon points="250,145 270,125 255,180" fill="#ede5d8" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="270,125 280,140 255,180" fill="#e0d8cb" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Front legs -->
+  <polygon points="120,140 150,195 125,240" fill="#ddd5c8" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="120,140 105,195 125,240" fill="#d0c8bb" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Back legs -->
+  <polygon points="230,175 210,240 190,170" fill="#d9d0c2" stroke="#c8bfb0" stroke-width="0.5"/>
+  <polygon points="230,175 250,235 210,240" fill="#cec5b8" stroke="#c8bfb0" stroke-width="0.5"/>
+</svg>

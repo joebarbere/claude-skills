@@ -1,0 +1,304 @@
+/*
+ * acid-cupcake — A dark Bear Blog theme inspired by the Acid Cupcake colour scheme
+ * https://github.com/jsantell/AcidCupcakeColourScheme
+ *
+ * Palette:
+ *   Background:  #212426
+ *   Foreground:  #FFFDEB (warm cream)
+ *   Grey:        #727879
+ *   Green:       #AAEE22
+ *   Blue/Cyan:   #04DBE5
+ *   Pink:        #FF0077
+ *   Orange:      #FFB412
+ *   Red:         #f63d4e
+ *   Yellow:      #f6c83d
+ */
+
+/* ── Reset & Base ────────────────────────────────────────────────── */
+
+body {
+  font: 400 16px/1.6 "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
+  color: #FFFDEB;
+  background-color: #212426;
+  -webkit-font-feature-settings: "kern" 1;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+}
+
+::selection {
+  background: #FF0077;
+  color: #212426;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────── */
+
+body > * {
+  max-width: 740px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+@media screen and (max-width: 800px) {
+  body > * {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+/* ── Header / Nav ────────────────────────────────────────────────── */
+
+nav {
+  border-top: 5px solid #FF0077;
+  border-bottom: 1px solid #3a3d40;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+nav a {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #FF0077;
+}
+
+nav a:visited {
+  color: #FF0077;
+}
+
+nav a:hover {
+  color: #AAEE22;
+  text-decoration: none;
+}
+
+/* ── Typography ──────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: #FF0077;
+  margin-bottom: 15px;
+}
+
+h1 {
+  font-size: 38px;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+h2 { font-size: 30px; }
+h3 { font-size: 24px; color: #FFB412; }
+h4 { font-size: 20px; color: #04DBE5; }
+
+@media screen and (max-width: 800px) {
+  h1 { font-size: 32px; }
+  h2 { font-size: 26px; }
+  h3 { font-size: 21px; }
+}
+
+p, blockquote, pre, ul, ol, dl, figure, table, .highlight {
+  margin-bottom: 15px;
+}
+
+strong, b {
+  color: #FFB412;
+}
+
+em, i {
+  color: #AAEE22;
+  font-style: italic;
+}
+
+/* ── Links ───────────────────────────────────────────────────────── */
+
+a {
+  color: #04DBE5;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #04DBE5;
+}
+
+a:hover {
+  color: #AAEE22;
+  text-decoration: underline;
+}
+
+/* ── Lists ───────────────────────────────────────────────────────── */
+
+ul, ol {
+  margin-left: 30px;
+}
+
+li > ul, li > ol {
+  margin-bottom: 0;
+}
+
+li::marker {
+  color: #FF0077;
+}
+
+/* ── Blockquotes ─────────────────────────────────────────────────── */
+
+blockquote {
+  color: #727879;
+  border-left: 4px solid #FF0077;
+  padding-left: 15px;
+  font-size: 17px;
+  font-style: italic;
+}
+
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* ── Code ────────────────────────────────────────────────────────── */
+
+pre, code {
+  font-family: inherit;
+  font-size: 15px;
+  border: 1px solid #3a3d40;
+  border-radius: 3px;
+  background-color: #1a1c1e;
+  color: #AAEE22;
+}
+
+code {
+  padding: 1px 5px;
+}
+
+pre {
+  padding: 12px 16px;
+  overflow-x: auto;
+}
+
+pre > code {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+/* ── Images ──────────────────────────────────────────────────────── */
+
+img {
+  max-width: 100%;
+  vertical-align: middle;
+  border-radius: 3px;
+}
+
+figcaption {
+  font-size: 14px;
+  color: #727879;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────── */
+
+table {
+  width: 100%;
+  margin-bottom: 30px;
+  text-align: left;
+  color: #FFFDEB;
+  border-collapse: collapse;
+  border: 1px solid #3a3d40;
+}
+
+table tr:nth-child(even) {
+  background-color: #1a1c1e;
+}
+
+table th, table td {
+  padding: 10px 15px;
+}
+
+table th {
+  background-color: #2a2d30;
+  border: 1px solid #3a3d40;
+  color: #FFB412;
+}
+
+table td {
+  border: 1px solid #3a3d40;
+}
+
+/* ── Post Meta ───────────────────────────────────────────────────── */
+
+.post-meta, small, time {
+  font-size: 14px;
+  color: #727879;
+}
+
+/* ── Post List ───────────────────────────────────────────────────── */
+
+.blog-posts ul, .blog-posts ol {
+  list-style: none;
+  margin-left: 0;
+}
+
+.blog-posts li {
+  margin-bottom: 30px;
+}
+
+.blog-posts a {
+  font-size: 22px;
+  display: block;
+  color: #FF0077;
+}
+
+.blog-posts a:hover {
+  color: #AAEE22;
+}
+
+/* ── Post Content ────────────────────────────────────────────────── */
+
+article, .post-content, .e-content {
+  margin-bottom: 30px;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+
+footer {
+  border-top: 1px solid #3a3d40;
+  padding: 30px 0;
+  font-size: 15px;
+  color: #727879;
+}
+
+footer a {
+  color: #FF0077;
+}
+
+footer a:hover {
+  color: #AAEE22;
+}
+
+/* ── Horizontal Rules ────────────────────────────────────────────── */
+
+hr {
+  border: 0;
+  border-top: 1px solid #3a3d40;
+  margin: 30px 0;
+}
+
+/* ── Scrollbar (Webkit) ──────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #212426;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3d40;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF0077;
+}

@@ -1,0 +1,238 @@
+/*
+ * geohot — A minimal Bear Blog theme inspired by geohot.github.io/blog
+ * Based on Jekyll Minima: system fonts, light weight headings, near-black on near-white.
+ */
+
+/* ── Reset & Base ────────────────────────────────────────────────── */
+
+body {
+  font: 400 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  color: #111;
+  background-color: #fdfdfd;
+  -webkit-font-feature-settings: "kern" 1;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────── */
+
+body > * {
+  max-width: 740px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+@media screen and (max-width: 800px) {
+  body > * {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+/* ── Header / Nav ────────────────────────────────────────────────── */
+
+nav {
+  border-top: 5px solid #424242;
+  border-bottom: 1px solid #e8e8e8;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+nav a {
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  color: #424242;
+}
+
+nav a:visited {
+  color: #424242;
+}
+
+nav a:hover {
+  color: #111;
+  text-decoration: underline;
+}
+
+/* ── Typography ──────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  margin-bottom: 15px;
+}
+
+h1 {
+  font-size: 42px;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+h2 { font-size: 32px; }
+h3 { font-size: 26px; }
+h4 { font-size: 20px; }
+
+@media screen and (max-width: 800px) {
+  h1 { font-size: 36px; }
+  h2 { font-size: 28px; }
+  h3 { font-size: 22px; }
+}
+
+p, blockquote, pre, ul, ol, dl, figure, table, .highlight {
+  margin-bottom: 15px;
+}
+
+/* ── Links ───────────────────────────────────────────────────────── */
+
+a {
+  color: #2a7ae2;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #1756a9;
+}
+
+a:hover {
+  color: #111;
+  text-decoration: underline;
+}
+
+/* ── Lists ───────────────────────────────────────────────────────── */
+
+ul, ol {
+  margin-left: 30px;
+}
+
+li > ul, li > ol {
+  margin-bottom: 0;
+}
+
+/* ── Blockquotes ─────────────────────────────────────────────────── */
+
+blockquote {
+  color: #828282;
+  border-left: 4px solid #e8e8e8;
+  padding-left: 15px;
+  font-size: 18px;
+  letter-spacing: -1px;
+  font-style: italic;
+}
+
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* ── Code ────────────────────────────────────────────────────────── */
+
+pre, code {
+  font-size: 15px;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px;
+  background-color: #eef;
+}
+
+code {
+  padding: 1px 5px;
+}
+
+pre {
+  padding: 8px 12px;
+  overflow-x: auto;
+}
+
+pre > code {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+/* ── Images ──────────────────────────────────────────────────────── */
+
+img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+figcaption {
+  font-size: 14px;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────── */
+
+table {
+  width: 100%;
+  margin-bottom: 30px;
+  text-align: left;
+  color: #3f3f3f;
+  border-collapse: collapse;
+  border: 1px solid #e8e8e8;
+}
+
+table tr:nth-child(even) {
+  background-color: #f7f7f7;
+}
+
+table th, table td {
+  padding: 10px 15px;
+}
+
+table th {
+  background-color: #efefef;
+  border: 1px solid #ddd;
+}
+
+table td {
+  border: 1px solid #e8e8e8;
+}
+
+/* ── Post Meta ───────────────────────────────────────────────────── */
+
+.post-meta, small, time {
+  font-size: 14px;
+  color: #828282;
+}
+
+/* ── Post List ───────────────────────────────────────────────────── */
+
+.blog-posts ul, .blog-posts ol {
+  list-style: none;
+  margin-left: 0;
+}
+
+.blog-posts li {
+  margin-bottom: 30px;
+}
+
+.blog-posts a {
+  font-size: 24px;
+  display: block;
+}
+
+/* ── Post Content ────────────────────────────────────────────────── */
+
+article, .post-content, .e-content {
+  margin-bottom: 30px;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+
+footer {
+  border-top: 1px solid #e8e8e8;
+  padding: 30px 0;
+  font-size: 15px;
+  color: #828282;
+}
+
+/* ── Horizontal Rules ────────────────────────────────────────────── */
+
+hr {
+  border: 0;
+  border-top: 1px solid #e8e8e8;
+  margin: 30px 0;
+}

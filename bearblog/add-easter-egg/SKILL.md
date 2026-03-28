@@ -114,6 +114,21 @@ List available easter eggs by reading the subdirectories under `${CLAUDE_SKILL_D
   - `clear` / `help` / `version` / `quit`
 - **Dismiss:** Press `` ` `` again (toggle) or type `quit`
 
+### smaug
+- **Trigger:** Type `smaug`
+- **Effect:** A sparkling golden dragon scale appears on the page. Click it to fire Bard's Black Arrow — the arrow flies across the screen, strikes the scale with a golden flash and screen shake, the scale shatters into golden shards, and a dragon silhouette briefly roars in the background. Impact sound via Web Audio.
+- **Dismiss:** Sequence auto-completes after ~4s, or click backdrop during arrow phase
+
+### warcraft
+- **Trigger:** Type `zug zug`
+- **Effect:** Sparkling gold mine with nuggets appears. Click to hear a synthesized gold chime (Web Audio), see "+N GOLD" floating text, and a resource counter HUD. Every 3rd click spawns a walking peasant with a pickaxe who walks to the mine and back.
+- **Dismiss:** 20 seconds of inactivity, or click outside the mine
+
+### achievements
+- **Trigger:** Type `steam` (toggle — type again to disable)
+- **Effect:** Persistent fake achievement system. Steam-style toast notifications slide in at timed intervals with a ding sound (Web Audio). Achievements: "First Steps" (10s), "Getting Comfortable" (30s), "Dedicated Reader" (1m), "No Life" (2m), "Procrastination Master" (5m), "Blog Addict" (10m), "AFK?" (15m), "Legendary Lurker" (30m). Counter shows X/8 unlocked.
+- **Dismiss:** Type `steam` again to toggle off
+
 ## Removing an easter egg
 
 To remove an easter egg from a post, fetch the post content, remove the `<script>` block containing the easter egg code, and update the post.

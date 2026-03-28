@@ -52,13 +52,46 @@ async function screenshot(eggName: string) {
   await page.goto(`file://${SAMPLE_HTML}`);
   await page.waitForLoadState("networkidle");
 
+  // Per-egg wait times and post-trigger actions
+  const WAIT_TIMES: Record<string, number> = {
+    bladerunner: 3500,
+    konami: 3000,
+    jurassicpark: 4000,
+    mortalkombat: 5000,
+    nbajam: 3000,
+    hackers: 3500,
+    realgenius: 5000,
+    godzilla: 5000,
+    wargames: 8000,
+    quake: 2000,
+    smaug: 2000,
+    warcraft: 2000,
+    achievements: 1500,
+  };
+
   // Trigger the easter egg directly via the JS API
   await page.evaluate((name: string) => {
     (window as any).EasterEggs.trigger(name);
   }, eggName);
 
-  // Wait for the animation to play out (unfold + quote fade-in)
-  await page.waitForTimeout(3500);
+  // Post-trigger actions for interactive eggs
+  if (eggName === "smaug") {
+    // Wait for scale to appear, then click it
+    await page.waitForTimeout(1000);
+    const scale = await page.$(".ee-sm-scale");
+    if (scale) await scale.click();
+  } else if (eggName === "achievements") {
+    // Force first achievement toast for screenshot
+    await page.waitForTimeout(500);
+    await page.evaluate(() => {
+      if ((window as any)._eeAchievementsForce) {
+        (window as any)._eeAchievementsForce(0);
+      }
+    });
+  }
+
+  // Wait for the animation to play out
+  await page.waitForTimeout(WAIT_TIMES[eggName] ?? 3500);
 
   const outputPath = path.join(SAMPLES_DIR, `${eggName}.png`);
   await page.screenshot({ path: outputPath, fullPage: false });

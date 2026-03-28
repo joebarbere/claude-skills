@@ -223,8 +223,14 @@
         }, 500);
       });
 
-      // Scroll-to-top listener
+      // Scroll listener (scroll:top and scroll:fast)
+      var lastScrollY = window.scrollY;
+      var lastScrollTime = Date.now();
       document.addEventListener("scroll", function () {
+        var now = Date.now();
+        var dy = Math.abs(window.scrollY - lastScrollY);
+        var dt = now - lastScrollTime;
+
         if (window.scrollY === 0) {
           for (var name in self._registry) {
             var egg = self._registry[name];
@@ -237,6 +243,23 @@
             }
           }
         }
+
+        // scroll:fast — triggers when user scrolls > 800px in < 300ms
+        if (dt < 300 && dy > 800) {
+          for (var name2 in self._registry) {
+            var egg2 = self._registry[name2];
+            if (!egg2.enabled) continue;
+            if (egg2.once && egg2._triggered) continue;
+            if (egg2.event === "scroll:fast") {
+              egg2._triggered = true;
+              self._activeEggs.add(name2);
+              egg2.activate();
+            }
+          }
+        }
+
+        lastScrollY = window.scrollY;
+        lastScrollTime = now;
       });
     },
 

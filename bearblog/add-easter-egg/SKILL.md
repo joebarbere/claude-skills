@@ -129,6 +129,101 @@ List available easter eggs by reading the subdirectories under `${CLAUDE_SKILL_D
 - **Effect:** Persistent fake achievement system. Steam-style toast notifications slide in at timed intervals with a ding sound (Web Audio). Achievements: "First Steps" (10s), "Getting Comfortable" (30s), "Dedicated Reader" (1m), "No Life" (2m), "Procrastination Master" (5m), "Blog Addict" (10m), "AFK?" (15m), "Legendary Lurker" (30m). Counter shows X/8 unlocked.
 - **Dismiss:** Type `steam` again to toggle off
 
+### bsod
+- **Trigger:** Type `bsod`
+- **Effect:** Classic Windows Blue Screen of Death overlay with fake error text, technical hex codes, and blinking cursor
+- **Dismiss:** Press any key, click, or wait 10 seconds
+
+### oregon
+- **Trigger:** Type `oregon`
+- **Effect:** Green-on-black Oregon Trail screen with random death message typewriter effect, tombstone SVG
+- **Dismiss:** Click or wait 12 seconds
+
+### asyouwish
+- **Trigger:** Type `asyouwish`
+- **Effect:** Princess Bride overlay on a green hillside night sky. Westley silhouette tumbles across. Iconic quotes cycle with fade transitions.
+- **Dismiss:** Click or wait 10 seconds
+
+### dayoff
+- **Trigger:** Type `dayoff`
+- **Effect:** Ferris Bueller fourth-wall-break overlay. Cycling quotes, subtle leopard vest stripes, mini Ferris character.
+- **Dismiss:** Click or wait 12 seconds
+
+### hello
+- **Trigger:** Type `hello`
+- **Effect:** Classic 1984 Macintosh "hello" in cursive drawn with SVG stroke-dasharray animation on beige background with Mac silhouette
+- **Dismiss:** Click or wait 8 seconds
+
+### triforce
+- **Trigger:** Type `triforce`
+- **Effect:** Golden Triforce materializes piece by piece with golden sparkle particles, "It's dangerous to go alone! Take this." text, ascending chime via Web Audio
+- **Dismiss:** Click or wait 10 seconds
+
+### oneup
+- **Trigger:** Type `1up`
+- **Effect:** Mario ? block bumps, green 1-UP mushroom pops out, "1 UP" text floats up, coins fly from block. Classic coin sound via Web Audio (square wave B5→E6).
+- **Dismiss:** Click or wait 8 seconds
+
+### c64
+- **Trigger:** Type `c64`
+- **Effect:** Commodore 64 blue boot screen. "64K RAM SYSTEM 38911 BASIC BYTES FREE" typewriter text with blinking block cursor.
+- **Dismiss:** Click or wait 10 seconds
+
+### dir
+- **Trigger:** Type `dir`
+- **Effect:** MS-DOS directory listing with fake blog files (EASTREGG.JS 31,337 bytes, SECRETS.TXT 0 bytes, etc.). Typewriter output.
+- **Dismiss:** Click or wait 10 seconds
+
+### invaders
+- **Trigger:** Type `invaders`
+- **Effect:** Canvas-rendered Space Invaders with 8×4 formation descending, auto-firing ship, pixel explosion flashes on hit. Score display.
+- **Dismiss:** Click or wait 12 seconds
+
+### wakawaka
+- **Trigger:** Type `wakawaka`
+- **Effect:** Pac-Man chases four colored ghosts across the screen eating dots. After 4 seconds ghosts turn blue (power pellet mode).
+- **Dismiss:** Click or wait 10 seconds
+
+### lv426
+- **Trigger:** Type `lv426`
+- **Effect:** Aliens motion tracker radar with sweeping line, blips getting closer, distance readout counting down, ping sound via Web Audio. "They're coming outta the walls!" quote.
+- **Dismiss:** Click or wait 15 seconds
+
+### tetris
+- **Trigger:** Type `tetris`
+- **Effect:** Colored tetrominos rain down and stack at the bottom of the page. Classic Tetris piece shapes (I, O, T, S, Z, J, L) in standard colors.
+- **Dismiss:** Click or wait 12 seconds
+
+### maxhead
+- **Trigger:** Type `maxhead`
+- **Effect:** Max Headroom glitch overlay with jittering SVG face, stuttering quotes that cycle, horizontal glitch bars, CRT scanlines, neon blue/magenta color scheme.
+- **Dismiss:** Click or wait 10 seconds
+
+### pkemeter
+- **Trigger:** Type `pkemeter`
+- **Effect:** Ghostbusters PKE meter with spreading wings, rising gauge needle, climbing reading. No-ghost logo flashes in. "WHO YA GONNA CALL? GHOSTBUSTERS!" text.
+- **Dismiss:** Click or wait 10 seconds
+
+### flynn
+- **Trigger:** Type `flynn`
+- **Effect:** Tron lightcycle arena. Two cycles (blue and orange) race across a neon grid leaving glowing trails. Random turns, wall bouncing. "END OF LINE." text.
+- **Dismiss:** Click or wait 10 seconds
+
+### rubiks
+- **Trigger:** Type `rubiks`
+- **Effect:** 3D CSS Rubik's cube that rotates continuously. Cells scramble to random colors then solve back to original faces. "SOLVING..." → "SOLVED!" text.
+- **Dismiss:** Click or wait 12 seconds
+
+### delorean
+- **Trigger:** Type `delorean` (also triggers on fast scroll)
+- **Effect:** DeLorean speeds across screen with climbing speedometer to 88 MPH, flux capacitor glow, fire trail, white flash at 88, "GREAT SCOTT!" text.
+- **Dismiss:** Click or wait 10 seconds
+
+### asteroids
+- **Trigger:** Type `hyperspace`
+- **Effect:** Classic Asteroids vector graphics on canvas. Rotating ship auto-fires at drifting asteroids that split into smaller pieces on hit.
+- **Dismiss:** Click or wait 12 seconds
+
 ## Removing an easter egg
 
 To remove an easter egg from a post, fetch the post content, remove the `<script>` block containing the easter egg code, and update the post.

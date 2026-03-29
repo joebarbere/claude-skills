@@ -41,10 +41,15 @@ function dashboardUrl(subdomain: string, subpath = ""): string {
 
 async function launch(headless: boolean) {
   const browser = await chromium.launch({ headless });
-  const opts = fs.existsSync(STATE_FILE)
-    ? { storageState: STATE_FILE }
-    : undefined;
-  const context = await browser.newContext(opts);
+  const contextOpts: Record<string, unknown> = {
+    userAgent:
+      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    extraHTTPHeaders: { Referer: BASE_URL + "/" },
+  };
+  if (fs.existsSync(STATE_FILE)) {
+    contextOpts.storageState = STATE_FILE;
+  }
+  const context = await browser.newContext(contextOpts);
   return { browser, context };
 }
 
@@ -293,16 +298,246 @@ async function update(uid: string, filePath: string) {
   }
 }
 
+// ── Media commands ──────────────────────────────────────────────────
+
+async function mediaList() {
+  const config = requireConfig();
+  const { browser, context } = await launch(true);
+
+  try {
+    const page = await context.newPage();
+    await page.goto(dashboardUrl(config.subdomain, "media/"));
+    await requireSession(page);
+
+    const media = await page.evaluate(() => {
+      const results: Array<{
+        url: string;
+        filename: string;
+        date: string;
+        type: "image" | "document";
+      }> = [];
+
+      // Images are in .media-container as <img> elements
+      const images = document.querySelectorAll<HTMLImageElement>(
+        ".media-container img"
+      );
+      for (const img of images) {
+        const url = img.src || img.getAttribute("data-src") || "";
+        const filename = url.split("/").pop() ?? "";
+        const container =
+          img.closest("div, li, article") ??
+          img.parentElement?.parentElement;
+        const dateEl = container?.querySelector("small, .date, time, span");
+        const date = dateEl?.textContent?.trim() ?? "";
+        results.push({ url, filename, date, type: "image" });
+      }
+
+      // Documents are listed separately (non-image items with checkboxes)
+      const checkboxes = document.querySelectorAll<HTMLInputElement>(
+        'input[name="selected_media"]'
+      );
+      const imageUrls = new Set(results.map((r) => r.url));
+      for (const cb of checkboxes) {
+        const url = cb.value;
+        if (imageUrls.has(url)) continue;
+        const container = cb.closest("div, li, tr");
+        const dateEl = container?.querySelector("small, .date, time, span");
+        const date = dateEl?.textContent?.trim() ?? "";
+        const filename = url.split("/").pop() ?? "";
+        results.push({ url, filename, date, type: "document" });
+      }
+
+      return results;
+    });
+
+    console.log(JSON.stringify(media, null, 2));
+  } finally {
+    await browser.close();
+  }
+}
+
+async function mediaUpload(filePaths: string[], raw: boolean) {
+  const config = requireConfig();
+  const { browser, context } = await launch(true);
+
+  try {
+    const page = await context.newPage();
+    await page.goto(dashboardUrl(config.subdomain, "media/"));
+    await requireSession(page);
+
+    const uploadUrl = `${BASE_URL}/${config.subdomain}/dashboard/upload-image/`;
+    const results: Array<{ file: string; success: boolean; url?: string; error?: string }> = [];
+
+    for (const filePath of filePaths) {
+      const absPath = path.resolve(filePath);
+      if (!fs.existsSync(absPath)) {
+        results.push({ file: filePath, success: false, error: "File not found" });
+        continue;
+      }
+
+      const fileSize = fs.statSync(absPath).size;
+      if (fileSize > 10 * 1024 * 1024) {
+        results.push({ file: filePath, success: false, error: "File exceeds 10MB limit" });
+        continue;
+      }
+
+      const result = await page.evaluate(
+        async ({ uploadUrl, fileName, fileBase64, fileType, raw }) => {
+          const csrfToken =
+            document.cookie.match(/csrftoken=([^;]+)/)?.[1] ??
+            (
+              document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+              ) as HTMLInputElement | null
+            )?.value ??
+            "";
+
+          // Convert base64 back to binary
+          const binaryStr = atob(fileBase64);
+          const bytes = new Uint8Array(binaryStr.length);
+          for (let i = 0; i < binaryStr.length; i++) {
+            bytes[i] = binaryStr.charCodeAt(i);
+          }
+          const blob = new Blob([bytes], { type: fileType });
+
+          const formData = new FormData();
+          formData.append("file", blob, fileName);
+          if (raw) formData.append("raw", "on");
+
+          const resp = await fetch(uploadUrl, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: formData,
+          });
+
+          const text = await resp.text();
+          return { ok: resp.ok, status: resp.status, body: text };
+        },
+        {
+          uploadUrl,
+          fileName: path.basename(absPath),
+          fileBase64: fs.readFileSync(absPath).toString("base64"),
+          fileType: getMimeType(absPath),
+          raw,
+        }
+      );
+
+      if (result.ok) {
+        // Try to extract URL from response
+        let url: string | undefined;
+        try {
+          const parsed = JSON.parse(result.body);
+          url = parsed.url || parsed.file_url || undefined;
+        } catch {
+          url = result.body.trim() || undefined;
+        }
+        results.push({ file: filePath, success: true, url });
+      } else {
+        results.push({
+          file: filePath,
+          success: false,
+          error: `HTTP ${result.status}: ${result.body.slice(0, 200)}`,
+        });
+      }
+    }
+
+    console.log(JSON.stringify(results, null, 2));
+  } finally {
+    await browser.close();
+  }
+}
+
+async function mediaDelete(urls: string[]) {
+  const config = requireConfig();
+  const { browser, context } = await launch(true);
+
+  try {
+    const page = await context.newPage();
+    await page.goto(dashboardUrl(config.subdomain, "media/"));
+    await requireSession(page);
+
+    const deleteUrl = dashboardUrl(config.subdomain, "media/delete-selected/");
+
+    const result = await page.evaluate(
+      async ({ deleteUrl, urls }) => {
+        const csrfToken =
+          document.cookie.match(/csrftoken=([^;]+)/)?.[1] ??
+          (
+            document.querySelector(
+              "[name=csrfmiddlewaretoken]"
+            ) as HTMLInputElement | null
+          )?.value ??
+          "";
+
+        const params = new URLSearchParams();
+        for (const url of urls) {
+          params.append("selected_media", url);
+        }
+
+        const resp = await fetch(deleteUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrfToken,
+          },
+          body: params.toString(),
+          redirect: "follow",
+        });
+
+        return { ok: resp.ok, status: resp.status };
+      },
+      { deleteUrl, urls }
+    );
+
+    console.log(JSON.stringify({ success: result.ok, deleted: urls }));
+  } finally {
+    await browser.close();
+  }
+}
+
+function getMimeType(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+  const mimeTypes: Record<string, string> = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+    ".avif": "image/avif",
+    ".svg": "image/svg+xml",
+    ".bmp": "image/bmp",
+    ".ico": "image/x-icon",
+    ".tiff": "image/tiff",
+    ".mp4": "video/mp4",
+    ".webm": "video/webm",
+    ".mkv": "video/x-matroska",
+    ".mp3": "audio/mpeg",
+    ".ogg": "audio/ogg",
+    ".wav": "audio/wav",
+    ".pdf": "application/pdf",
+    ".doc": "application/msword",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".woff": "font/woff",
+    ".woff2": "font/woff2",
+    ".ttf": "font/ttf",
+    ".otf": "font/otf",
+  };
+  return mimeTypes[ext] ?? "application/octet-stream";
+}
+
 // ── CLI ─────────────────────────────────────────────────────────────
 
 const USAGE = `Usage: bearblog.ts <command>
 
 Commands:
-  login                    Open browser to log in and save session
-  list                     List all posts (published and drafts)
-  get <uid> [-o <file>]    Get a post's content, optionally save to file
-  create <file> [--publish] Create a new post from a local file
-  update <uid> <file>      Update an existing post from a local file`;
+  login                          Open browser to log in and save session
+  list                           List all posts (published and drafts)
+  get <uid> [-o <file>]          Get a post's content, optionally save to file
+  create <file> [--publish]      Create a new post from a local file
+  update <uid> <file>            Update an existing post from a local file
+  media-list                     List all media files
+  media-upload <file>... [--raw] Upload files (--raw skips optimization)
+  media-delete <url>...          Delete media by URL`;
 
 const args = process.argv.slice(2);
 const cmd = args[0];
@@ -343,6 +578,25 @@ function die(msg: string): never {
       const file = args[2];
       if (!uid || !file) die("Usage: bearblog.ts update <uid> <file>");
       await update(uid, file);
+      break;
+    }
+
+    case "media-list":
+      await mediaList();
+      break;
+
+    case "media-upload": {
+      const raw = args.includes("--raw");
+      const files = args.slice(1).filter((a) => a !== "--raw");
+      if (files.length === 0) die("Usage: bearblog.ts media-upload <file>... [--raw]");
+      await mediaUpload(files, raw);
+      break;
+    }
+
+    case "media-delete": {
+      const urls = args.slice(1);
+      if (urls.length === 0) die("Usage: bearblog.ts media-delete <url>...");
+      await mediaDelete(urls);
       break;
     }
 

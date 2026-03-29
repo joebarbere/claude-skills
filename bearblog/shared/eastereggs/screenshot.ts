@@ -56,7 +56,7 @@ async function screenshot(eggName: string) {
   const WAIT_TIMES: Record<string, number> = {
     bladerunner: 3500,
     konami: 3000,
-    jurassicpark: 4000,
+    jurassicpark: 7500,
     mortalkombat: 5000,
     nbajam: 3000,
     hackers: 3500,

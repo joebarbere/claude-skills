@@ -83,6 +83,52 @@ Bear Blog accepts both **Markdown** and **HTML** in the post body. Ask the user 
 - `{{ posts }}` with filters: `|tag:X`, `|limit:N`, `|order:asc/desc`
 - `{{ email_signup }}` — embedded subscription form
 
+## Marking a post as AI-generated or AI-assisted
+
+When the user asks to flag a post's AI involvement, add a badge using the icon bundled with this skill at `${CLAUDE_SKILL_DIR}/assets/ai-generated.png`. There are **two distinct cases** — pick placement by which one the user means:
+
+| User says | Meaning | Where the icon goes |
+|-----------|---------|---------------------|
+| **AI generated** ("mark this as AI generated") | Written by AI | To the **right of the post title** |
+| **AI assisted** ("mark this as AI assisted") | Human-written with AI help | **Inline in the post body** |
+
+**Step 1 (both cases): host the icon.** Upload it to the user's Bear Blog media **once per blog** — if it's already there (run `bearblog.ts media-list` and look for `ai-generated`), reuse that URL instead of re-uploading:
+
+```bash
+cd ${CLAUDE_SKILL_DIR}/../scripts && npx tsx bearblog.ts media-upload ${CLAUDE_SKILL_DIR}/assets/ai-generated.png --raw
+```
+
+This prints the hosted CDN URL. Note that Bear re-encodes all uploads to WebP regardless — transparency is preserved, so the icon still works — and `--raw` just skips Bear's extra optimization/resizing pass on this small asset.
+
+**Step 2a — AI generated → right of the post title.** Bear Blog renders the post title as the first `<h1>` inside `<main>`, and the post body (including any `<style>`) renders after it, so you can target it from the body. Add this to the top of the body:
+
+```html
+<style>
+main h1::after {
+  content: "";
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 0.35em;
+  vertical-align: middle;
+  background: url("<UPLOADED_URL>") no-repeat center / contain;
+  /* The Flaticon icon is solid black. On a dark-themed blog, add the next
+     line so it renders light; remove it on a light theme. */
+  filter: invert(1);
+}
+</style>
+```
+
+**Step 2b — AI assisted → inline in the post body.** Place a small badge line in the body (top or bottom, per the user's preference):
+
+```html
+<p class="ai-badge"><img src="<UPLOADED_URL>" alt="AI-assisted" width="18" height="18" style="vertical-align:text-bottom"> Written with AI assistance.</p>
+```
+
+On a dark theme, add `style="... filter:invert(1);"` to the `<img>` so the black icon is visible.
+
+**Attribution:** The icon is from [Flaticon](https://www.flaticon.com/free-icon/generative_16806607), whose free license requires visible attribution. Make sure the blog credits it somewhere the reader can see (blog footer or the post itself), e.g. `AI icon by Flaticon`. Only skip this if the user has a Flaticon license that waives attribution.
+
 ## Writing guidelines
 
 - Write in the user's existing voice and style (learn from existing posts in their chosen directory).

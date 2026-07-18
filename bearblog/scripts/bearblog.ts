@@ -93,7 +93,8 @@ async function submitPost(
   body: string,
   publish: boolean
 ): Promise<{ ok: boolean; status: number; redirected: string }> {
-  // Set field values in the DOM
+  // Set field values in the DOM. header_content is a contentEditable <div>
+  // (set via innerText); body_content is a <textarea> (set via value).
   await page.evaluate(
     ({ h, b }) => {
       const headerEl = document.getElementById("header_content");
@@ -106,40 +107,29 @@ async function submitPost(
     { h: header, b: body }
   );
 
-  // POST via fetch inside the page context (uses existing session cookies)
-  return page.evaluate(async ({ publish }) => {
-    const csrfToken =
-      document.cookie.match(/csrftoken=([^;]+)/)?.[1] ??
-      (
-        document.querySelector(
-          "[name=csrfmiddlewaretoken]"
-        ) as HTMLInputElement | null
-      )?.value ??
-      "";
+  // Saving requires a real form submission — a plain fetch POST is accepted
+  // (HTTP 200, form re-rendered) but silently NOT persisted. The submit
+  // buttons set the hidden #publish field and submit the form with navigation:
+  //   #publish-button   → publish  (sets #publish = true)
+  //   #save-button      → draft, on the new-post page
+  //   #unpublish-button → draft, on an already-published post's edit page
+  const buttonId = publish
+    ? "#publish-button"
+    : (await page.$("#save-button"))
+      ? "#save-button"
+      : "#unpublish-button";
 
-    const headerContent =
-      document.getElementById("header_content")?.innerText ?? "";
-    const bodyContent =
-      (document.getElementById("body_content") as HTMLTextAreaElement)?.value ??
-      "";
+  const navPromise = page
+    .waitForNavigation({ waitUntil: "load" })
+    .catch(() => null);
+  await page.click(buttonId);
+  const resp = await navPromise;
 
-    const params = new URLSearchParams();
-    params.append("header_content", headerContent);
-    params.append("body_content", bodyContent);
-    params.append("publish", publish ? "true" : "false");
-
-    const resp = await fetch(window.location.pathname, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRFToken": csrfToken,
-      },
-      body: params.toString(),
-      redirect: "follow",
-    });
-
-    return { ok: resp.ok, status: resp.status, redirected: resp.url };
-  }, { publish });
+  return {
+    ok: resp ? resp.ok() : true,
+    status: resp ? resp.status() : 0,
+    redirected: page.url(),
+  };
 }
 
 // ── Commands ────────────────────────────────────────────────────────
@@ -290,9 +280,15 @@ async function update(uid: string, filePath: string) {
     await page.goto(dashboardUrl(config.subdomain, `posts/${uid}/`));
     await requireSession(page);
 
-    const result = await submitPost(page, header, body, false);
+    // Preserve the post's current published state: an already-published
+    // post's edit page has an #unpublish-button; a draft has #save-button.
+    const isPublished = !!(await page.$("#unpublish-button"));
 
-    console.log(JSON.stringify({ success: result.ok, uid }));
+    const result = await submitPost(page, header, body, isPublished);
+
+    console.log(
+      JSON.stringify({ success: result.ok, uid, published: isPublished })
+    );
   } finally {
     await browser.close();
   }

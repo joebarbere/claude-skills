@@ -92,7 +92,12 @@ async function submitPost(
   header: string,
   body: string,
   publish: boolean
-): Promise<{ ok: boolean; status: number; redirected: string }> {
+): Promise<{
+  ok: boolean;
+  status: number;
+  redirected: string;
+  error: string | null;
+}> {
   // Set field values in the DOM. header_content is a contentEditable <div>
   // (set via innerText); body_content is a <textarea> (set via value).
   await page.evaluate(
@@ -125,10 +130,22 @@ async function submitPost(
   await page.click(buttonId);
   const resp = await navPromise;
 
+  // On a validation failure (e.g. a header field exceeding its DB column
+  // length) Bear re-renders the editor at HTTP 200 with a banner like
+  // "Header attribute error - your post has not been saved. Error: ..."
+  // instead of redirecting to the saved post — so a 200 alone does NOT mean
+  // the post was saved. Detect that banner and treat it as a hard failure.
+  const error = await page.evaluate(() => {
+    const text = document.body.innerText || "";
+    const m = text.match(/[^\n]*post has not been saved[^\n]*/i);
+    return m ? m[0].trim() : null;
+  });
+
   return {
-    ok: resp ? resp.ok() : true,
+    ok: (resp ? resp.ok() : true) && !error,
     status: resp ? resp.status() : 0,
     redirected: page.url(),
+    error,
   };
 }
 
@@ -259,11 +276,27 @@ async function create(filePath: string, publish: boolean) {
 
     const result = await submitPost(page, header, body, publish);
 
-    // Try to extract new post UID from redirect URL
+    // Try to extract new post UID from redirect URL. A successful create
+    // redirects to /posts/<uid>/; a failure re-renders at /posts/new/, so a
+    // uid of "new" (or none) means the post was NOT created.
     const uidMatch = result.redirected.match(/\/dashboard\/posts\/([^/]+)\/?$/);
     const uid = uidMatch?.[1] ?? null;
+    const saved = result.ok && uid !== null && uid !== "new";
 
-    console.log(JSON.stringify({ success: result.ok, uid, published: publish }));
+    if (!saved) {
+      console.error(
+        JSON.stringify({
+          success: false,
+          uid: null,
+          error:
+            result.error ??
+            "Post was not created (the editor did not redirect to a saved post — likely a validation error such as a header field exceeding its length limit; note meta_description max is 200 chars).",
+        })
+      );
+      process.exit(1);
+    }
+
+    console.log(JSON.stringify({ success: true, uid, published: publish }));
   } finally {
     await browser.close();
   }
@@ -286,8 +319,21 @@ async function update(uid: string, filePath: string) {
 
     const result = await submitPost(page, header, body, isPublished);
 
+    if (!result.ok) {
+      console.error(
+        JSON.stringify({
+          success: false,
+          uid,
+          error:
+            result.error ??
+            "Post was not saved (validation error — check that header fields are within their length limits; meta_description max is 200 chars).",
+        })
+      );
+      process.exit(1);
+    }
+
     console.log(
-      JSON.stringify({ success: result.ok, uid, published: isPublished })
+      JSON.stringify({ success: true, uid, published: isPublished })
     );
   } finally {
     await browser.close();
